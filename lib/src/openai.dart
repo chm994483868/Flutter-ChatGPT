@@ -51,9 +51,13 @@ class OpenAI {
   ///build environment for openai [build]
   ///setup http client
   ///setup logger
-  OpenAI build({String? kURL, String? token, HttpSetup? baseOption, bool isLogger = false}) {
+  OpenAI build(
+      {String baseURL = "https://api.openai.com",
+      String? token,
+      HttpSetup? baseOption,
+      bool isLogger = false}) {
     // 传递 kURL 进来
-    kURL = kURL;
+    kURL = "${baseURL}/v1/";
 
     _buildShared();
 
