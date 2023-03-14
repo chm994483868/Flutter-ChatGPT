@@ -25,6 +25,10 @@ class OpenAI {
 
   late OpenAIClient _client;
 
+  /// 把 dio 公开出去，方便添加 pretty_dio_logger，使 log 格式更舒适
+  late Dio dio;
+  late String kURL;
+
   /// openai token
   /// use for access for chat gpt [_token]
   static String? _token;
@@ -47,13 +51,16 @@ class OpenAI {
   ///build environment for openai [build]
   ///setup http client
   ///setup logger
-  OpenAI build({String? token, HttpSetup? baseOption, bool isLogger = false}) {
+  OpenAI build({String? kURL, String? token, HttpSetup? baseOption, bool isLogger = false}) {
+    // 传递 kURL 进来
+    kURL = kURL;
+
     _buildShared();
 
     if ("$token".isEmpty) throw MissionTokenException();
     final setup = baseOption == null ? HttpSetup() : baseOption;
 
-    final dio = Dio(BaseOptions(
+    dio = Dio(BaseOptions(
         sendTimeout: setup.sendTimeout,
         connectTimeout: setup.connectTimeout,
         receiveTimeout: setup.receiveTimeout));
@@ -106,8 +113,7 @@ class OpenAI {
     return _completeControl!.stream;
   }
 
-  StreamController<CTResponse>? _completeControl =
-      StreamController<CTResponse>.broadcast();
+  StreamController<CTResponse>? _completeControl = StreamController<CTResponse>.broadcast();
   void _completeText({required CompleteText request}) {
     _client.postStream("$kURL$kCompletion", request.toJson()).listen((rawData) {
       if (rawData.statusCode != HttpStatus.ok) {
@@ -135,15 +141,13 @@ class OpenAI {
 
   ///Given a chat conversation, the model will return a chat completion response.
   Future<ChatCTResponse?> onChatCompletion({required ChatCompleteText request}) {
-    return _client.post("$kURL$kChatGptTurbo", request.toJson(),
-        onSuccess: (it) {
+    return _client.post("$kURL$kChatGptTurbo", request.toJson(), onSuccess: (it) {
       return ChatCTResponse.fromJson(it);
     });
   }
 
   ///Given a chat conversation, the model will return a chat completion response.
-  Stream<ChatCTResponse?> onChatCompletionStream(
-      {required ChatCompleteText request}) {
+  Stream<ChatCTResponse?> onChatCompletionStream({required ChatCompleteText request}) {
     _chatCompleteText(request: request);
     return _chatCompleteControl!.stream;
   }
@@ -151,9 +155,7 @@ class OpenAI {
   StreamController<ChatCTResponse>? _chatCompleteControl =
       StreamController<ChatCTResponse>.broadcast();
   void _chatCompleteText({required ChatCompleteText request}) {
-    _client
-        .postStream("$kURL$kChatGptTurbo", request.toJson())
-        .listen((rawData) {
+    _client.postStream("$kURL$kChatGptTurbo", request.toJson()).listen((rawData) {
       if (rawData.statusCode != HttpStatus.ok) {
         _client.log.errorLog(code: rawData.statusCode, error: rawData.data);
         _chatCompleteControl
@@ -192,9 +194,7 @@ class OpenAI {
 
   final _genImgController = StreamController<GenImgResponse>.broadcast();
   void _generateImage(GenerateImage request) {
-    _client
-        .postStream("$kURL$kGenerateImage", request.toJson())
-        .listen((rawData) {
+    _client.postStream("$kURL$kGenerateImage", request.toJson()).listen((rawData) {
       if (rawData.statusCode != HttpStatus.ok) {
         _client.log.errorLog(code: rawData.statusCode, error: rawData.data);
         _genImgController
@@ -209,14 +209,14 @@ class OpenAI {
           ..add(GenImgResponse.fromJson(rawData.data));
       }
     }).onError((err) => {
-              if (err is DioError)
-                {
-                  _genImgController
-                    ..sink
-                    ..addError(
-                        "generate image error: message :${err.message}\nerror body :${err.response?.data}, code: ${err.response?.statusCode}")
-                }
-            });
+          if (err is DioError)
+            {
+              _genImgController
+                ..sink
+                ..addError(
+                    "generate image error: message :${err.message}\nerror body :${err.response?.data}, code: ${err.response?.statusCode}")
+            }
+        });
   }
 
   /// close generate image stream[genImgClose]
@@ -227,8 +227,7 @@ class OpenAI {
 
   ///generate image with prompt
   Future<GenImgResponse?> generateImage(GenerateImage request) async {
-    return _client.post("$kURL$kGenerateImage", request.toJson(),
-        onSuccess: (it) {
+    return _client.post("$kURL$kGenerateImage", request.toJson(), onSuccess: (it) {
       return GenImgResponse.fromJson(it);
     });
   }
