@@ -24,11 +24,11 @@ class OpenAIClient extends OpenAIWrapper {
     final rawData = await _dio.get(url);
 
     if (rawData.statusCode == HttpStatus.ok) {
-      log.debugString(
-          "============= success ==================\nresponse body :${rawData.data}");
+      // log.debugString(
+          // "============= success ==================\nresponse body :${rawData.data}");
       return onSuccess(rawData.data);
     } else {
-      log.errorLog(code: rawData.statusCode, error: "${rawData.data}");
+      // log.errorLog(code: rawData.statusCode, error: "${rawData.data}");
       throw RequestError(message: "${rawData.data}", code: rawData.statusCode);
     }
   } on DioError catch (err) {
@@ -39,17 +39,17 @@ class OpenAIClient extends OpenAIWrapper {
   Future<T> post<T>(String url,Map<String,dynamic> request,
       {required T Function(Map<String, dynamic>) onSuccess}) async {
     try {
-      log.debugString("request body :$request");
+      // log.debugString("request body :$request");
 
       final rawData = await _dio.post(url,
           data: json.encode(request));
       if (rawData.statusCode == HttpStatus.ok) {
-        log.debugString("status code :${rawData.statusCode}");
-        log.debugString(
-            "============= success ==================\nresponse body :${rawData.data}");
+        // log.debugString("status code :${rawData.statusCode}");
+        // log.debugString(
+            // "============= success ==================\nresponse body :${rawData.data}");
         return onSuccess(rawData.data);
       } else {
-        log.errorLog(code: rawData.statusCode, error: "${rawData.data}");
+        // log.errorLog(code: rawData.statusCode, error: "${rawData.data}");
         throw RequestError(message: "${rawData.data}", code: rawData.statusCode);
       }
     } on DioError catch (err){
@@ -58,7 +58,7 @@ class OpenAIClient extends OpenAIWrapper {
   }
 
   Stream<Response> postStream(String url,Map<String,dynamic> request)  {
-    log.debugString("request body :$request");
+    // log.debugString("request body :$request");
     return  _dio.post(url,
         data: json.encode(request)).asStream();
   }

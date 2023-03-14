@@ -127,8 +127,8 @@ class OpenAI {
           ..addError(
               "complete error: ${rawData.statusMessage} code: ${rawData.statusCode} data: ${rawData.data}");
       } else {
-        _client.log.debugString(
-            "============= success ==================\nresponse body :${rawData.data}");
+        // _client.log.debugString(
+        //     "============= success ==================\nresponse body :${rawData.data}");
         _completeControl
           ?..sink
           ..add(CTResponse.fromJson(rawData.data));
@@ -167,8 +167,8 @@ class OpenAI {
           ..addError(
               "chat complete error: ${rawData.statusMessage} code: ${rawData.statusCode} data: ${rawData.data}");
       } else {
-        _client.log.debugString(
-            "============= success ==================\nresponse body :${rawData.data}");
+        // _client.log.debugString(
+        //     "============= success ==================\nresponse body :${rawData.data}");
         _chatCompleteControl
           ?..sink
           ..add(ChatCTResponse.fromJson(rawData.data));
@@ -206,8 +206,8 @@ class OpenAI {
           ..addError(
               "generate image error: ${rawData.statusMessage} code: ${rawData.statusCode} data: ${rawData.data}");
       } else {
-        _client.log.debugString(
-            "============= success ==================\nresponse body :${rawData.data}");
+        // _client.log.debugString(
+        //     "============= success ==================\nresponse body :${rawData.data}");
         _genImgController
           ..sink
           ..add(GenImgResponse.fromJson(rawData.data));
